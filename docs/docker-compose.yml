@@ -1,0 +1,6 @@
+services:
+  docs:
+    image: ghcr.io/caicarton2402/infinite-canvas-docs:latest
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
