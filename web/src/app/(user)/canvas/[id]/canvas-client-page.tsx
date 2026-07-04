@@ -64,6 +64,7 @@ import {
 } from "../types";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio } from "@/types/media";
+import { canvasProjectHref } from "@/lib/routes";
 
 type CanvasClipboard = {
     nodes: CanvasNodeData[];
@@ -127,7 +128,7 @@ function createCanvasNode(type: CanvasNodeType, position: Position, metadata?: C
     };
 }
 
-export default function CanvasPage() {
+export default function CanvasPage({ projectIdOverride }: { projectIdOverride?: string } = {}) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -222,7 +223,7 @@ function InfiniteCanvasPage() {
     const params = useParams<{ id: string }>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const projectId = params.id;
+    const projectId = projectIdOverride || params.id;
     const localAgentConnected = useCanvasAgentStore((state) => state.connected);
     const localAgentActivity = useCanvasAgentStore((state) => state.activity);
     const localAgentEnabled = useCanvasAgentStore((state) => state.enabled);
@@ -1032,7 +1033,7 @@ function InfiniteCanvasPage() {
 
     const createAndOpenProject = useCallback(() => {
         const id = createProject(`无限画布 ${useCanvasStore.getState().projects.length + 1}`);
-        router.push(`/canvas/${id}`);
+        router.push(canvasProjectHref(id));
     }, [createProject, router]);
 
     const deleteCurrentProject = useCallback(() => {

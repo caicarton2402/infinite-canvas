@@ -11,10 +11,16 @@ const localChangelog = readFileSync(resolve(webDir, "../CHANGELOG.md"), "utf8");
 
 export default function nextConfig(phase: string): NextConfig {
     const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+    const isGitHubPages = process.env.GITHUB_PAGES === "true";
     const releases = parseChangelog(localChangelog);
 
     return {
-        output: "standalone",
+        output: isGitHubPages ? "export" : "standalone",
+        basePath: isGitHubPages ? "/infinite-canvas" : undefined,
+        assetPrefix: isGitHubPages ? "/infinite-canvas" : undefined,
+        images: {
+            unoptimized: isGitHubPages,
+        },
         allowedDevOrigins: isDev ? ["*.*.*.*"] : [],
         typescript: {
             ignoreBuildErrors: true,
@@ -22,6 +28,8 @@ export default function nextConfig(phase: string): NextConfig {
         env: {
             NEXT_PUBLIC_APP_VERSION: localVersion,
             NEXT_PUBLIC_APP_RELEASES: JSON.stringify(releases),
+            NEXT_PUBLIC_STATIC_EXPORT: isGitHubPages ? "true" : "false",
+            NEXT_PUBLIC_BASE_PATH: isGitHubPages ? "/infinite-canvas" : "",
         },
     };
 }

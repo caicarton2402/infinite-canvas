@@ -23,6 +23,10 @@ export type PromptListResponse = {
 };
 
 export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROMPTS_OPTION, page, pageSize }: { keyword?: string; tag?: string[]; category?: string; page?: number; pageSize?: number } = {}) {
+    if (process.env.NEXT_PUBLIC_STATIC_EXPORT === "true") {
+        return { items: [], tags: [], categories: [], total: 0 } satisfies PromptListResponse;
+    }
+
     const params = serializeApiParams(
         compactApiParams({
             ...(keyword ? { keyword } : {}),

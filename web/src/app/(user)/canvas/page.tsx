@@ -14,6 +14,8 @@ import type { CanvasExportFile } from "./export-types";
 import { useCanvasStore } from "./stores/use-canvas-store";
 import { useCanvasUiStore } from "./stores/use-canvas-ui-store";
 import { exportCanvasProjects } from "./utils/canvas-export";
+import { canvasProjectHref } from "@/lib/routes";
+import CanvasClientPage from "./[id]/canvas-client-page";
 
 export default function CanvasPage() {
     return (
@@ -37,10 +39,10 @@ function CanvasPageContent() {
     const setDeleteIds = useCanvasUiStore((state) => state.setDeleteProjectIds);
 
     const mode = searchParams.get("mode");
+    const staticProjectId = searchParams.get("projectId");
     const agentMode = mode === "new" || mode === "recent" || mode === "choose";
-    const agentQuery = agentMode ? `?${searchParams.toString()}` : "";
     const enterProject = (id: string) => {
-        router.push(`/canvas/${id}${agentQuery}`);
+        router.push(canvasProjectHref(id, agentMode ? searchParams : undefined));
     };
     const createAndEnter = () => enterProject(createProject(`无限画布 ${projects.length + 1}`));
     const importCanvas = async (file?: File) => {
@@ -74,6 +76,8 @@ function CanvasPageContent() {
         autoOpenRef.current = true;
         enterProject(mode === "new" ? createProject(`无限画布 ${projects.length + 1}`) : projects[0]?.id || createProject(`无限画布 ${projects.length + 1}`));
     }, [createProject, hydrated, mode, projects]);
+
+    if (staticProjectId) return <CanvasClientPage projectIdOverride={staticProjectId} />;
 
     if (hydrated && (mode === "new" || mode === "recent")) return <main className="flex h-full items-center justify-center bg-background text-sm text-stone-500">正在打开画布...</main>;
 
